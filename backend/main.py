@@ -112,6 +112,7 @@ RESUME_SYSTEM = (
     "27) Return ONLY the final formatted resume content. "
     "28) No explanations, no markdown fences, no commentary. "
     "29) The output should be immediately usable for generating a properly formatted DOCX or PDF resume with visible bold formatting."
+    "30) CRITICAL: Use actual newlines between every section, every job entry, every bullet point, and every line. Never use | as a line separator. Each bullet point must be on its own separate line. Each section header must be on its own separate line."
 )
 
 COVER_SYSTEM = (
