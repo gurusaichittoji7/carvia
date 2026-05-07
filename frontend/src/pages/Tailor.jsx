@@ -18,16 +18,22 @@ export default function Tailor() {
   async function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase()
     setFileName(file.name)
-    if (ext === 'txt') { setResumeText(await file.text()) }
-    else if (ext === 'docx') {
+    if (ext === 'txt') {
+      setResumeText(await file.text())
+    } else if (ext === 'docx') {
       const buf = await file.arrayBuffer()
       const res = await mammoth.extractRawText({ arrayBuffer: buf })
       setResumeText(res.value)
+    } else if (ext === 'pdf') {
+      setFileName(file.name + ' (PDF — please paste text instead)')
+      setResumeText('')
+      setTab('paste')
+      setError('PDF text extraction is not supported in browser. Please paste your resume text instead.')
     }
   }
   async function generate() {
     if (!jd.trim()) { setError('Please paste a job description.'); return }
-    if (!resumeText.trim()) { setError('Please upload or paste your resume.'); return }
+    if (!resumeText.trim()) { setError('Please upload a DOCX/TXT or paste your resume text.'); return }
     setError(''); setLoading(true); setResult('')
     try {
       const data = await tailorResume({ resume_text: resumeText, job_description: jd, linkedin, github, portfolio })
@@ -58,7 +64,7 @@ export default function Tailor() {
             {['upload','paste'].map(t => (
               <button key={t} onClick={() => setTab(t)}
                 className={'text-xs px-4 py-1.5 rounded-full border ' + (tab===t ? 'bg-blue-600 text-white border-transparent' : 'border-gray-200 text-gray-500')}>
-                {t === 'upload' ? 'Upload file' : 'Paste text'}
+                {t === 'upload' ? 'Upload DOCX/TXT' : 'Paste text'}
               </button>
             ))}
           </div>
@@ -67,16 +73,17 @@ export default function Tailor() {
               <div className="text-3xl mb-2">📄</div>
               <p className="text-sm text-gray-400">Drop your resume here</p>
               <p className="text-xs text-blue-600 font-medium mt-1">Browse file</p>
-              <p className="text-xs text-gray-300 mt-1">PDF · DOCX · TXT</p>
+              <p className="text-xs text-gray-300 mt-1">DOCX · TXT</p>
               {fileName && <p className="text-xs text-green-600 mt-2">✓ {fileName}</p>}
-              <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" className="hidden"
+              <input ref={fileRef} type="file" accept=".docx,.txt" className="hidden"
                 onChange={e => e.target.files[0] && handleFile(e.target.files[0])} />
             </div>
           ) : (
             <textarea value={resumeText} onChange={e => setResumeText(e.target.value)}
               className="w-full h-48 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
-              placeholder="Paste your full resume here..." />
+              placeholder="Paste your full resume text here..." />
           )}
+          <p className="text-xs text-gray-400 mt-2">💡 For PDF resumes — copy all text and paste it in the Paste text tab</p>
         </div>
         <div className="border border-gray-200 rounded-2xl p-5 bg-white">
           <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">Job Description</p>
