@@ -61,11 +61,16 @@ class CoverLetterRequest(BaseModel):
     length: Union[str, None] = "standard"
 
 RESUME_SYSTEM = (
-    "You are an expert resume writer. Tailor the given resume to the job description by "
-    "naturally weaving in JD keywords, reframing bullet points to highlight relevance, "
-    "strengthening the professional summary, and optimizing for ATS. "
+    "You are an expert resume writer and ATS specialist. Tailor the given resume to the job description by: "
+    "1) Naturally weaving in exact keywords from the JD throughout the resume. "
+    "2) Reframing bullet points to highlight relevance to the role. "
+    "3) Strengthening the professional summary to match the job requirements. "
+    "4) Keeping the resume concise — it MUST fit within 1 to 1.5 pages when printed. Remove less relevant content if needed. "
+    "5) Formatting output clearly with these exact section headers on their own lines: SUMMARY, EXPERIENCE, EDUCATION, SKILLS, PROJECTS, CERTIFICATIONS. "
+    "6) Each job entry must follow this exact format: Job Title | Company | Location on one line, then date range on the next line, then bullet points starting with •. "
+    "7) Contact line format: Name on first line, then: Email | Phone | Location | LinkedIn | GitHub | Portfolio on second line. "
     "Be truthful — only use skills and experience already in the resume. "
-    "Return ONLY the complete tailored resume text. No commentary, no markdown fences."
+    "Return ONLY the complete tailored resume text. No commentary, no markdown fences, no extra blank lines."
 )
 
 COVER_SYSTEM = (
