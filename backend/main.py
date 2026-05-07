@@ -1,4 +1,5 @@
 import os
+import base64
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -7,7 +8,7 @@ from slowapi.errors import RateLimitExceeded
 from pydantic import BaseModel
 from anthropic import Anthropic
 from supabase import create_client, Client
-from typing import Optional
+from typing import Optional, Union
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="Carvia API", version="1.0.0")
@@ -43,19 +44,21 @@ async def get_current_user(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="Token verification failed")
 
 class ResumeRequest(BaseModel):
-    resume_text: str
+    resume_text: Union[str, None] = None
+    resume_pdf_base64: Union[str, None] = None
     job_description: str
-    linkedin: Optional[str] = None
-    github: Optional[str] = None
-    portfolio: Optional[str] = None
+    linkedin: Union[str, None] = None
+    github: Union[str, None] = None
+    portfolio: Union[str, None] = None
 
 class CoverLetterRequest(BaseModel):
-    resume_text: str
+    resume_text: Union[str, None] = None
+    resume_pdf_base64: Union[str, None] = None
     job_description: str
-    hiring_manager: Optional[str] = None
-    company: Optional[str] = None
-    tone: Optional[str] = "professional"
-    length: Optional[str] = "standard"
+    hiring_manager: Union[str, None] = None
+    company: Union[str, None] = None
+    tone: Union[str, None] = "professional"
+    length: Union[str, None] = "standard"
 
 RESUME_SYSTEM = (
     "You are an expert resume writer. Tailor the given resume to the job description by "
@@ -81,6 +84,14 @@ def extract_job_title(jd: str) -> str:
             return line.strip()[:100]
     return "Untitled Role"
 
+def build_messages(resume_text, resume_pdf_base64, extra_text):
+    if resume_pdf_base64:
+        return [{"role": "user", "content": [
+            {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": resume_pdf_base64}},
+            {"type": "text", "text": extra_text}
+        ]}]
+    return [{"role": "user", "content": f"My resume:\n\n{resume_text}\n\n{extra_text}"}]
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -88,54 +99,56 @@ def health():
 @app.post("/tailor")
 @limiter.limit("20/hour")
 async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depends(get_current_user)):
+    if not body.resume_text and not body.resume_pdf_base64:
+        raise HTTPException(status_code=400, detail="Resume text or PDF required")
     links = ""
     if body.linkedin: links += f"\nLinkedIn: {body.linkedin}"
-    if body.github:   links += f"\nGitHub: {body.github}"
+    if body.github: links += f"\nGitHub: {body.github}"
     if body.portfolio: links += f"\nPortfolio: {body.portfolio}"
     if links: links = "\n\nInclude these links in the header:" + links
-
-    user_msg = f"My resume:\n\n{body.resume_text}{links}\n\nJob description:\n\n{body.job_description}\n\nTailor my resume. Return only the tailored resume text."
-
+    extra = f"Job description:\n\n{body.job_description}{links}\n\nTailor my resume. Return only the tailored resume text."
+    messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
             max_tokens=2048,
             system=RESUME_SYSTEM,
-            messages=[{"role": "user", "content": user_msg}],
+            messages=messages,
         )
         tailored = response.content[0].text
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Claude error: {str(e)}")
-
     try:
         supabase.table("resumes").insert({
             "user_id": user["id"],
-            "original_resume": body.resume_text,
+            "original_resume": body.resume_text or "PDF upload",
             "tailored_resume": tailored,
             "job_description": body.job_description,
             "job_title": extract_job_title(body.job_description),
         }).execute()
     except Exception:
         pass
-
     return {"tailored_resume": tailored}
 
 @app.post("/cover-letter")
 @limiter.limit("20/hour")
 async def cover_letter(body: CoverLetterRequest, request: Request, user: dict = Depends(get_current_user)):
+    if not body.resume_text and not body.resume_pdf_base64:
+        raise HTTPException(status_code=400, detail="Resume text or PDF required")
     greeting = f"Dear {body.hiring_manager}" if body.hiring_manager else "Dear Hiring Manager"
-    user_msg = (
-        f"My resume:\n\n{body.resume_text}\n\nJob description:\n\n{body.job_description}\n\n"
+    extra = (
+        f"Job description:\n\n{body.job_description}\n\n"
         f"Greeting: {greeting}\nCompany: {body.company or 'the company'}\n"
         f"Tone: {body.tone}\nLength: {LENGTH_MAP.get(body.length, '4 paragraphs')}\n\n"
         "Write the cover letter. Return only the cover letter text."
     )
+    messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
             max_tokens=1024,
             system=COVER_SYSTEM,
-            messages=[{"role": "user", "content": user_msg}],
+            messages=messages,
         )
         return {"cover_letter": response.content[0].text}
     except Exception as e:
