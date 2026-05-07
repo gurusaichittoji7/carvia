@@ -1,65 +1,15 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-function cleanResume(text) {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\|\s*(SUMMARY|SKILLS|EXPERIENCE|EDUCATION|PROJECTS|CERTIFICATIONS|ACHIEVEMENTS|TECHNICAL SKILLS)\s*\|/gi, '\n\n$1\n')
-    .replace(/\|\s*•/g, '\n•')
-    .replace(/\|\s*([A-Z][^|]{2,60})\s*\|/g, '\n$1\n')
-    .replace(/\|\s*/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
-
-const STYLES = {
-  classic: {
-    fontFamily: 'Georgia, serif',
-    fontSize: '13px',
-    lineHeight: '1.7',
-    color: '#111',
-    padding: '48px 60px',
-    background: '#fff',
-  },
-  modern: {
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '13px',
-    lineHeight: '1.7',
-    color: '#1e293b',
-    padding: '48px 60px',
-    background: '#fff',
-  },
-  minimal: {
-    fontFamily: 'Helvetica, sans-serif',
-    fontSize: '12.5px',
-    lineHeight: '1.9',
-    color: '#333',
-    padding: '48px 60px',
-    background: '#fff',
-    letterSpacing: '0.01em',
-  },
-  professional: {
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '13px',
-    lineHeight: '1.7',
-    color: '#111',
-    padding: '48px 60px',
-    background: '#fff',
-    borderLeft: '4px solid #2563eb',
-    paddingLeft: '56px',
-  },
-  executive: {
-    fontFamily: 'Georgia, serif',
-    fontSize: '13.5px',
-    lineHeight: '1.85',
-    color: '#111',
-    padding: '48px 60px',
-    background: '#fff',
-    letterSpacing: '0.01em',
-  },
-}
-
 const TEMPLATES = ['classic', 'modern', 'minimal', 'professional', 'executive']
+
+const CSS = {
+  classic: 'font-family:Georgia,serif;font-size:13px;line-height:1.7;color:#111;',
+  modern: 'font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1e293b;',
+  minimal: 'font-family:Helvetica,sans-serif;font-size:12.5px;line-height:1.9;color:#333;letter-spacing:0.01em;',
+  professional: 'font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#111;border-left:4px solid #2563eb;padding-left:52px;',
+  executive: 'font-family:Georgia,serif;font-size:13.5px;line-height:1.85;color:#111;letter-spacing:0.01em;',
+}
 
 export default function ResumeOutput() {
   const { state } = useLocation()
@@ -69,88 +19,70 @@ export default function ResumeOutput() {
 
   if (!state?.resume) { nav('/tailor'); return null }
 
-  const clean = cleanResume(state.resume)
+  const resume = state.resume
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 
   function copy() {
-    navigator.clipboard.writeText(clean)
+    navigator.clipboard.writeText(resume)
     setCopied(true); setTimeout(() => setCopied(false), 2000)
   }
 
   function downloadTxt() {
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([clean], { type: 'text/plain' }))
+    a.href = URL.createObjectURL(new Blob([resume], { type: 'text/plain' }))
     a.download = 'carvia_resume.txt'; a.click()
   }
 
   function downloadPdf() {
-    const s = STYLES[template]
     const w = window.open('', '_blank')
-    w.document.write(`<!DOCTYPE html><html><head><title>Resume</title><style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        font-family: ${s.fontFamily};
-        font-size: ${s.fontSize};
-        line-height: ${s.lineHeight};
-        color: ${s.color};
-        padding: ${s.padding};
-        max-width: 820px;
-        margin: 0 auto;
-        ${s.borderLeft ? `border-left: ${s.borderLeft};` : ''}
-        ${s.letterSpacing ? `letter-spacing: ${s.letterSpacing};` : ''}
-      }
-      pre { white-space: pre-wrap; font-family: inherit; font-size: inherit; }
-    </style></head><body><pre>${clean}</pre></body></html>`)
+    w.document.write(`<!DOCTYPE html><html><head><title>Resume</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{${CSS[template]}padding:40px 52px;max-width:820px;margin:0 auto;}
+      pre{white-space:pre-wrap;font-family:inherit;font-size:inherit;line-height:inherit;}
+    </style></head><body><pre>${resume}</pre></body></html>`)
     w.document.close()
     setTimeout(() => { w.focus(); w.print() }, 500)
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div style={{minHeight:'100vh',background:'#f1f5f9'}}>
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <button onClick={() => nav('/tailor')} className="text-sm text-gray-500 hover:text-gray-900">← Back</button>
-          <h1 className="text-sm font-medium text-gray-900">Your tailored resume</h1>
+      <div style={{background:'#fff',borderBottom:'1px solid #e2e8f0',padding:'12px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:10,boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}}>
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          <button onClick={() => nav('/tailor')} style={{fontSize:13,color:'#64748b',background:'none',border:'none',cursor:'pointer'}}>← Back</button>
+          <span style={{fontSize:13,fontWeight:500,color:'#111'}}>Your tailored resume</span>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={copy}
-            className={'text-sm border rounded-lg px-4 py-1.5 ' + (copied ? 'border-green-400 text-green-600' : 'border-gray-200 hover:bg-gray-50')}>
+        <div style={{display:'flex',gap:8}}>
+          <button onClick={copy} style={{fontSize:13,padding:'6px 16px',border:'1px solid',borderColor:copied?'#4ade80':'#e2e8f0',borderRadius:8,background:'#fff',color:copied?'#16a34a':'#374151',cursor:'pointer'}}>
             {copied ? '✓ Copied' : 'Copy'}
           </button>
-          <button onClick={downloadTxt} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50">
+          <button onClick={downloadTxt} style={{fontSize:13,padding:'6px 16px',border:'1px solid #e2e8f0',borderRadius:8,background:'#fff',color:'#374151',cursor:'pointer'}}>
             Download TXT
           </button>
-          <button onClick={downloadPdf} className="text-sm bg-blue-600 text-white rounded-lg px-4 py-1.5 hover:bg-blue-700 font-medium">
+          <button onClick={downloadPdf} style={{fontSize:13,padding:'6px 16px',border:'none',borderRadius:8,background:'#2563eb',color:'#fff',fontWeight:500,cursor:'pointer'}}>
             Save as PDF
           </button>
         </div>
       </div>
 
-      {/* Template selector */}
-      <div className="bg-white border-b border-gray-100 px-6 py-2 flex items-center gap-3">
-        <span className="text-xs font-medium uppercase tracking-widest text-gray-400 mr-2">Template</span>
+      {/* Template tabs */}
+      <div style={{background:'#fff',borderBottom:'1px solid #f1f5f9',padding:'8px 24px',display:'flex',alignItems:'center',gap:8}}>
+        <span style={{fontSize:11,fontWeight:500,textTransform:'uppercase',letterSpacing:'0.07em',color:'#94a3b8',marginRight:8}}>Template</span>
         {TEMPLATES.map(t => (
-          <button key={t} onClick={() => setTemplate(t)}
-            className={'text-xs px-4 py-1.5 rounded-full border capitalize transition-colors ' + (template === t ? 'bg-gray-900 text-white border-transparent' : 'border-gray-200 text-gray-500 hover:bg-gray-50')}>
+          <button key={t} onClick={() => setTemplate(t)} style={{fontSize:12,padding:'4px 14px',borderRadius:20,border:'1px solid',borderColor:template===t?'transparent':'#e2e8f0',background:template===t?'#111':'transparent',color:template===t?'#fff':'#64748b',cursor:'pointer',textTransform:'capitalize'}}>
             {t}
           </button>
         ))}
       </div>
 
-      {/* Resume preview */}
-      <div className="max-w-4xl mx-auto py-10 px-4">
-        <div className="bg-white shadow-sm rounded-xl overflow-hidden">
-          <pre style={{
-            ...STYLES[template],
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            fontFamily: STYLES[template].fontFamily,
-            fontSize: STYLES[template].fontSize,
-            lineHeight: STYLES[template].lineHeight,
-            color: STYLES[template].color,
-            display: 'block',
-          }}>
-            {clean}
+      {/* Resume */}
+      <div style={{maxWidth:860,margin:'32px auto',padding:'0 16px'}}>
+        <div style={{background:'#fff',borderRadius:12,boxShadow:'0 1px 4px rgba(0,0,0,0.08)',padding:'48px 60px'}}>
+          <pre style={{whiteSpace:'pre-wrap',wordWrap:'break-word',...Object.fromEntries(CSS[template].split(';').filter(Boolean).map(r => { const [k,...v]=r.split(':'); return [k.trim().replace(/-([a-z])/g,(_,c)=>c.toUpperCase()),v.join(':').trim()]; }))}}>
+            {resume}
           </pre>
         </div>
       </div>
