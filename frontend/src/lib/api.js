@@ -14,7 +14,10 @@ export async function tailorResume(payload) {
     headers: await authHeaders(),
     body: JSON.stringify(payload)
   })
-  if (!res.ok) throw new Error((await res.json()).detail || 'Failed')
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail))
+  }
   return res.json()
 }
 
@@ -24,7 +27,10 @@ export async function generateCoverLetter(payload) {
     headers: await authHeaders(),
     body: JSON.stringify(payload)
   })
-  if (!res.ok) throw new Error((await res.json()).detail || 'Failed')
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail))
+  }
   return res.json()
 }
 
