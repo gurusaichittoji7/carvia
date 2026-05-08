@@ -114,6 +114,8 @@ RESUME_SYSTEM = (
     "28) No explanations, no markdown fences, no commentary. "
     "29) The output should be immediately usable for generating a properly formatted DOCX or PDF resume with visible bold formatting."
     "30) CRITICAL: Use actual newlines between every section, every job entry, every bullet point, and every line. Never use | as a line separator. Each bullet point must be on its own separate line. Each section header must be on its own separate line."
+    "31) CRITICAL: Never start a bullet point with **bold text**: — instead write the category name in bold INLINE within the sentence or just list items without a bold label prefix. Example wrong: '• **Languages:** Python' — Example right: 'Languages & Frameworks: Python, Java...' as a plain line, not a bullet. "
+    "32) CRITICAL: Keep the entire resume to ONE page maximum. Be extremely concise. Each bullet must be 1 line only. Skills section must be flat lines not bullets. Remove any content that is not directly relevant to the job description."
 )
 
 COVER_SYSTEM = (
