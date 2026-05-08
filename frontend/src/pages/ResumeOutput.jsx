@@ -19,10 +19,9 @@ export default function ResumeOutput() {
 
   if (!state?.resume) { nav('/tailor'); return null }
 
-  const resume = state.resume
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  const { resume: rawResume, linkedin, github, portfolio } = state
+
+  let resume = rawResume.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n{3,}/g, '\n\n').trim()
 
   function copy() {
     navigator.clipboard.writeText(resume)
@@ -81,9 +80,13 @@ export default function ResumeOutput() {
       {/* Resume */}
       <div style={{maxWidth:860,margin:'32px auto',padding:'0 16px'}}>
         <div style={{background:'#fff',borderRadius:12,boxShadow:'0 1px 4px rgba(0,0,0,0.08)',padding:'48px 60px'}}>
-          <pre style={{whiteSpace:'pre-wrap',wordWrap:'break-word',...Object.fromEntries(CSS[template].split(';').filter(Boolean).map(r => { const [k,...v]=r.split(':'); return [k.trim().replace(/-([a-z])/g,(_,c)=>c.toUpperCase()),v.join(':').trim()]; }))}}>
-            {resume}
-          </pre>
+          <div style={{whiteSpace:'pre-wrap',wordWrap:'break-word',fontFamily:fonts[tmpl],fontSize:13,lineHeight:1.75,color:'#111',margin:0}}
+            dangerouslySetInnerHTML={{__html: resume
+              .replace(/LinkedIn/g, linkedin ? `<a href="${linkedin}" target="_blank" style="color:#2563eb;text-decoration:none;">LinkedIn</a>` : '')
+              .replace(/GitHub/g, github ? `<a href="${github}" target="_blank" style="color:#2563eb;text-decoration:none;">GitHub</a>` : '')
+              .replace(/Portfolio/g, portfolio ? `<a href="${portfolio}" target="_blank" style="color:#2563eb;text-decoration:none;">Portfolio</a>` : '')
+            }}
+          />
         </div>
       </div>
     </div>

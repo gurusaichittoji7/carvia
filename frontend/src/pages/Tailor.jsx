@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { tailorResume } from '../lib/api'
 import mammoth from 'mammoth'
+
 export default function Tailor() {
   const [tab, setTab] = useState('upload')
   const [resumeText, setResumeText] = useState('')
@@ -15,6 +16,7 @@ export default function Tailor() {
   const [error, setError] = useState('')
   const fileRef = useRef()
   const nav = useNavigate()
+
   async function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase()
     setFileName(file.name)
@@ -33,6 +35,7 @@ export default function Tailor() {
       setResumePdfBase64(btoa(binary))
     }
   }
+
   async function generate() {
     if (!jd.trim()) { setError('Please paste a job description.'); return }
     if (!resumeText.trim() && !resumePdfBase64) { setError('Please upload or paste your resume.'); return }
@@ -43,10 +46,11 @@ export default function Tailor() {
         resume_pdf_base64: resumePdfBase64 || null,
         job_description: jd, linkedin, github, portfolio
       })
-      nav('/resume-output', { state: { resume: data.tailored_resume } })
+      nav('/resume-output', { state: { resume: data.tailored_resume, linkedin, github, portfolio } })
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
   }
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-xl font-medium text-gray-900 mb-6">Tailor your resume</h1>
@@ -85,7 +89,9 @@ export default function Tailor() {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3 mb-4">
-        {[['LinkedIn',linkedin,setLinkedin,'linkedin.com/in/yourname'],['GitHub',github,setGithub,'github.com/yourusername'],['Portfolio',portfolio,setPortfolio,'yourportfolio.com']].map(([label,val,setter,ph]) => (
+        {[['LinkedIn',linkedin,setLinkedin,'linkedin.com/in/yourname'],
+          ['GitHub',github,setGithub,'github.com/yourusername'],
+          ['Portfolio',portfolio,setPortfolio,'yourportfolio.com']].map(([label,val,setter,ph]) => (
           <div key={label}>
             <label className="text-xs font-medium uppercase tracking-widest text-gray-400 block mb-1">{label}</label>
             <input value={val} onChange={e => setter(e.target.value)} placeholder={ph}
