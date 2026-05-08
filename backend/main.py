@@ -81,8 +81,9 @@ RESUME_SYSTEM = (
     
     "HEADER FORMAT RULES: "
     "12) Candidate name must appear alone at the top in prominent formatting style. "
-    "13) The contact line directly below the name must stay on ONE SINGLE LINE in this exact structure: "
-    "Email | Phone | Location | LinkedIn | GitHub | Portfolio "
+    "13) The contact line directly below the name must stay on ONE SINGLE LINE. "
+"Only include links that are provided. Use clean labels not full URLs: LinkedIn | GitHub | Portfolio. "
+"If a link is not provided, do not include it. "
     "14) LinkedIn, GitHub, and Portfolio links must appear minimized/clean in the contact line only. "
     "15) Never place raw standalone links elsewhere in the resume body. "
     
@@ -149,10 +150,10 @@ async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depe
     if not body.resume_text and not body.resume_pdf_base64:
         raise HTTPException(status_code=400, detail="Resume text or PDF required")
     links = ""
-    if body.linkedin: links += f"\nLinkedIn: {body.linkedin}"
-    if body.github: links += f"\nGitHub: {body.github}"
-    if body.portfolio: links += f"\nPortfolio: {body.portfolio}"
-    if links: links = "\n\nInclude these links in the header:" + links
+    if body.linkedin: links += f"\nLinkedIn"
+    if body.github: links += f"\nGitHub"
+    if body.portfolio: links += f"\nPortfolio"
+    if links: links = "\n\nInclude these links as clean labels in the contact line only (not full URLs):" + links
     extra = f"Job description:\n\n{body.job_description}{links}\n\nTailor my resume. Return only the tailored resume text."
     messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
     try:
