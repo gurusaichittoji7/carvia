@@ -103,7 +103,16 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       const last = parts[parts.length-1].trim()
       const first = parts.slice(0,-1).join(" | ").trim()
       elements.push(
-          <div key={i} style={{display:"flex",gap:6,marginBottom:1,fontSize:12,lineHeight:1.4}}>
+          <div
+  key={i}
+  style={{
+    display:"flex",
+    justifyContent:"space-between",
+    alignItems:"baseline",
+    fontSize:12,
+    lineHeight:1.4
+  }}
+>
           <span style={{fontWeight:700,fontSize:13}} dangerouslySetInnerHTML={{__html: processLine(first, linkedin, github, portfolio)}} />
           <span style={{fontSize:11,fontStyle:"italic",color:"#666",marginLeft:16,whiteSpace:"nowrap"}}>{last}</span>
         </div>
