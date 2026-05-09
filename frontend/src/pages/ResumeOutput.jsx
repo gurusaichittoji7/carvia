@@ -23,9 +23,13 @@ function processLine(line, linkedin, github, portfolio) {
     .replace(/^([^–-]+)(\s[–-]\s)/, "<strong>$1</strong>$2")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(/\s*\|\s*LinkedIn|LinkedIn\s*\|\s*|LinkedIn/g, linkedin ? "<a href=\""+linkedin+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">LinkedIn</a>" : "")
-    .replace(/\s*\|\s*GitHub|GitHub\s*\|\s*|GitHub/g, github ? "<a href=\""+github+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">GitHub</a>" : "")
-    .replace(/\s*\|\s*Portfolio|Portfolio\s*\|\s*|Portfolio/g, portfolio ? "<a href=\""+portfolio+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">Portfolio</a>" : "")
+    .replace(/LinkedIn/g, linkedin ? "<a href=\""+linkedin+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">LinkedIn</a>" : "")
+    .replace(/\s*\|\s*$/g, "")
+    .replace(/GitHub/g, github ? "<a href=\""+github+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">GitHub</a>" : "")
+    .replace(/Portfolio/g, portfolio ? "<a href=\""+portfolio+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">Portfolio</a>" : "")
+    .replace(/\|\s*\|/g, "|")
+    .replace(/\|\s*$/g, "")
+    .replace(/^\s*\|\s*/g, "")
 }
 
 function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
