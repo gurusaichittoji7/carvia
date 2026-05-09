@@ -230,7 +230,7 @@ export default function ResumeOutput() {
     const content = document.querySelector("#resume-content")
     if (!content) return
     const w = window.open("","_blank")
-    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:36px 48px;max-width:800px;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
+    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:36px 48px;max-width:760px;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
     w.document.close()
     setTimeout(()=>{w.focus();w.print()},500)
   }
