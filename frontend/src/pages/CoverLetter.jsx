@@ -134,7 +134,7 @@ export default function CoverLetter() {
         className="w-full bg-blue-600 text-white py-3 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 mb-6">
         {loading ? "Writing your cover letter..." : "Write my cover letter with Carvia"}
       </button>
-      <button onClick={downloadPdf} className="text-xs bg-blue-600 text-white rounded-lg px-3 py-1.5 hover:bg-blue-700">Save as PDF</button>
+
       {result && (
         <div>
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
@@ -144,6 +144,7 @@ export default function CoverLetter() {
                 {copied ? "✓ Copied" : "Copy"}
               </button>
               <button onClick={downloadTxt} className="text-xs border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50">Download TXT</button>
+              <button onClick={downloadPdf} className="text-xs bg-blue-600 text-white rounded-lg px-3 py-1.5 hover:bg-blue-700">Save as PDF</button>
             </div>
           </div>
           <div className="border border-gray-200 rounded-2xl p-8 text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
