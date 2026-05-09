@@ -111,7 +111,20 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       continue
     }
 
-    elements.push(<div key={i} style={{fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3,...sectionStyle}}>{line}</div>)
+    elements.push(
+  <div
+    key={i}
+    style={{
+      fontSize:12,
+      lineHeight:1.5,
+      marginBottom:6,
+      color:"#111"
+    }}
+    dangerouslySetInnerHTML={{
+      __html: processLine(line, linkedin, github, portfolio)
+    }}
+  />
+)
   }
 
   return <div id="resume-content" style={{fontFamily:FONT[tmpl]}}>{elements}</div>
