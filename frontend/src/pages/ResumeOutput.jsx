@@ -32,11 +32,11 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   const elements = []
 
   const sectionStyle = {
-    classic:      { borderBottom:"1.5px solid #111", color:"#111", marginTop:16, paddingBottom:3 },
-    modern:       { borderLeft:"3px solid #2563eb", paddingLeft:8, color:"#2563eb", marginTop:16 },
-    minimal:      { color:"#999", letterSpacing:3, marginTop:18 },
-    professional: { borderBottom:"1px solid #e2e8f0", color:"#888", marginTop:16, paddingBottom:3 },
-    executive:    { borderBottom:"2px solid #111", color:"#111", textAlign:"center", marginTop:16, paddingBottom:3 },
+    classic:      { borderBottom:"1.5px solid #111", color:"#111", marginTop:8, paddingBottom:2 },
+    modern:       { borderLeft:"3px solid #2563eb", paddingLeft:8, color:"#2563eb", marginTop:8 },
+    minimal:      { color:"#999", letterSpacing:3, marginTop:10 },
+    professional: { borderBottom:"1px solid #e2e8f0", color:"#888", marginTop:8, paddingBottom:2 },
+    executive:    { borderBottom:"2px solid #111", color:"#111", textAlign:"center", marginTop:8, paddingBottom:2 },
   }[tmpl]
 
   const nameStyle = {
@@ -66,7 +66,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       const name = headerLines[0] || ""
       const contact = headerLines.slice(1).join(" | ")
       elements.push(
-        <div key="hdr" style={{marginBottom:14}}>
+        <div key="hdr" style={{marginBottom:6}}>
           <div style={nameStyle}>{name}</div>
           <div style={contactStyle} dangerouslySetInnerHTML={{__html: processLine(contact, linkedin, github, portfolio)}} />
         </div>
@@ -80,7 +80,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
 
     if (/^[•\-\*]/.test(line)) {
       elements.push(
-        <div key={i} style={{display:"flex",gap:8,marginBottom:3,fontSize:13,lineHeight:1.6}}>
+        <div key={i} style={{display:"flex",gap:8,marginBottom:1,fontSize:12,lineHeight:1.4}}>
           <span style={{flexShrink:0}}>•</span>
           <span dangerouslySetInnerHTML={{__html: processLine(line.replace(/^[•\-\*]\s*/,""), linkedin, github, portfolio)}} />
         </div>
@@ -93,7 +93,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       const last = parts[parts.length-1].trim()
       const first = parts.slice(0,-1).join(" | ").trim()
       elements.push(
-        <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginTop:8,marginBottom:2}}>
+          <div key={i} style={{display:"flex",gap:6,marginBottom:1,fontSize:12,lineHeight:1.4}}>
           <span style={{fontWeight:700,fontSize:13}} dangerouslySetInnerHTML={{__html: processLine(first, linkedin, github, portfolio)}} />
           <span style={{fontSize:11,fontStyle:"italic",color:"#666",marginLeft:16,whiteSpace:"nowrap"}}>{last}</span>
         </div>
@@ -101,7 +101,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       continue
     }
 
-    elements.push(<div key={i} style={{fontSize:13,lineHeight:1.6,marginBottom:3}} dangerouslySetInnerHTML={{__html: processLine(line, linkedin, github, portfolio)}} />)
+    elements.push(<div key={i} style={{fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3,...sectionStyle}}>{line}</div>)
   }
 
   return <div id="resume-content" style={{fontFamily:FONT[tmpl]}}>{elements}</div>
@@ -160,7 +160,7 @@ export default function ResumeOutput() {
         ))}
       </div>
       <div style={{maxWidth:860,margin:"32px auto",padding:"0 16px"}}>
-        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"48px 60px"}}>
+        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"32px 44px"}}>
           <ResumeContent resume={resume} tmpl={tmpl} linkedin={linkedin} github={github} portfolio={portfolio} />
         </div>
       </div>
