@@ -117,6 +117,8 @@ RESUME_SYSTEM = (
     "32) CRITICAL: Keep the entire resume to ONE page maximum. Be extremely concise. Each bullet must be 1 line only. Skills section must be flat lines not bullets. Remove any content that is not directly relevant to the job description."
     "33) STRICT FORMAT: Do not use **bold**, *italic*, markdown tables, markdown headings, or markdown bullets. Use only plain text section headers and bullet character • for bullet points. "
     "34) NEVER put a bullet before job titles, project names, education, or certifications. Bullets are only for achievement statements under jobs/projects. "
+    "35) In SKILLS section, bold ONLY the category labels before the colon. Example: 'Languages & Frameworks:' should be bold while the technologies remain normal text. "
+    "36) In PROJECTS section, bold ONLY the project name before the dash. Example: 'Looksy –' should be bold while the project description remains normal text. "
 )
 
 COVER_SYSTEM = (
