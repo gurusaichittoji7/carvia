@@ -23,8 +23,14 @@ function processLine(line, linkedin, github, portfolio) {
     .replace(/^([^–-]+)(\s[–-]\s)/, "<strong>$1</strong>$2")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/\|\s*\|/g, "|")
+    .replace(/\|\s*$/g, "")
+    .replace(/^\s*\|\s*/g, "")
+}
+
+function processContact(line, linkedin, github, portfolio) {
+  return line
     .replace(/LinkedIn/g, linkedin ? "<a href=\""+linkedin+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">LinkedIn</a>" : "")
-    .replace(/\s*\|\s*$/g, "")
     .replace(/GitHub/g, github ? "<a href=\""+github+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">GitHub</a>" : "")
     .replace(/Portfolio/g, portfolio ? "<a href=\""+portfolio+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">Portfolio</a>" : "")
     .replace(/\|\s*\|/g, "|")
@@ -92,8 +98,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       elements.push(
         <div key="hdr" style={{marginBottom:2}}>
           <div style={nameStyle}>{name}</div>
-          <div style={contactStyle} dangerouslySetInnerHTML={{__html: processLine(contact, linkedin, github, portfolio)}} />
-        </div>
+          <div style={contactStyle} dangerouslySetInnerHTML={{__html: processContact(contact, linkedin, github, portfolio)}} />        </div>
       )
     }
 
