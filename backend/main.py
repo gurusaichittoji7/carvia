@@ -73,26 +73,25 @@ RESUME_SYSTEM = (
     
     "VISUAL FORMATTING REQUIREMENTS: "
     "6) The output must be formatted for proper DOCX/PDF rendering with professional spacing and hierarchy. "
-    "7) Important technical keywords, project names, technologies, section headers, and high-impact metrics should be bolded naturally throughout the resume. "
+    "7) Do NOT use markdown symbols like ** or * anywhere in the resume output. The frontend will handle all visual styling. "
     "8) Bold only meaningful/high-value content — avoid overusing bold formatting. "
     "9) Project names must always be bolded. "
     "10) Key technologies, AI/ML tools, cloud platforms, frameworks, and measurable achievements should be selectively bolded where impactful. "
-    "11) Section headers must be bold and visually separated cleanly. "
+    "11) Section headers must be plain uppercase text only, without markdown symbols. Example: SUMMARY, SKILLS, EXPERIENCE. "
     
     "HEADER FORMAT RULES: "
     "12) Candidate name must appear alone at the top in prominent formatting style. "
     "13) The contact line directly below the name must stay on ONE SINGLE LINE. "
-"Only include links that are provided. Use clean labels not full URLs: LinkedIn | GitHub | Portfolio. "
-"If a link is not provided, do not include it. "
+    "Only include links that are provided. Use clean labels not full URLs: LinkedIn | GitHub | Portfolio. "
+    "If a link is not provided, do not include it. "
     "14) LinkedIn, GitHub, and Portfolio links must appear minimized/clean in the contact line only. "
     "15) Never place raw standalone links elsewhere in the resume body. "
     
     "SECTION RULES: "
     "16) Use these exact section headers only when applicable: "
     "SUMMARY, SKILLS, EXPERIENCE, PROJECTS, EDUCATION, CERTIFICATIONS, ACHIEVEMENTS "
-    "17) Each experience entry MUST follow this exact structure: "
-    "Job Title | Company | Location "
-    "Date Range "
+    "17) Each experience entry MUST follow this exact one-line structure: "
+    "Job Title | Company | Location | Date Range "
     "• Concise impact-focused bullet point "
     "• Concise impact-focused bullet point "
     "18) Every bullet must begin with • and remain concise (1–2 lines max). "
@@ -116,6 +115,8 @@ RESUME_SYSTEM = (
     "30) CRITICAL: Use actual newlines between every section, every job entry, every bullet point, and every line. Never use | as a line separator. Each bullet point must be on its own separate line. Each section header must be on its own separate line."
     "31) CRITICAL: Never start a bullet point with **bold text**: — instead write the category name in bold INLINE within the sentence or just list items without a bold label prefix. Example wrong: '• **Languages:** Python' — Example right: 'Languages & Frameworks: Python, Java...' as a plain line, not a bullet. "
     "32) CRITICAL: Keep the entire resume to ONE page maximum. Be extremely concise. Each bullet must be 1 line only. Skills section must be flat lines not bullets. Remove any content that is not directly relevant to the job description."
+    "33) STRICT FORMAT: Do not use **bold**, *italic*, markdown tables, markdown headings, or markdown bullets. Use only plain text section headers and bullet character • for bullet points. "
+    "34) NEVER put a bullet before job titles, project names, education, or certifications. Bullets are only for achievement statements under jobs/projects. "
 )
 
 COVER_SYSTEM = (
