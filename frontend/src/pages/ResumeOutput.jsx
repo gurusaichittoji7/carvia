@@ -80,11 +80,21 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
 
     if (/^[•\-\*]/.test(line)) {
       elements.push(
-        <div key={i} style={{display:"flex",gap:8,marginBottom:1,fontSize:12,lineHeight:1.4}}>
-          <span style={{flexShrink:0}}>•</span>
-          <span dangerouslySetInnerHTML={{__html: processLine(line.replace(/^[•\-\*]\s*/,""), linkedin, github, portfolio)}} />
-        </div>
-      )
+  <div
+    key={i}
+    style={{
+      fontSize:11,
+      fontWeight:700,
+      textTransform:"uppercase",
+      letterSpacing:1,
+      marginBottom:6,
+      ...sectionStyle
+    }}
+    dangerouslySetInnerHTML={{
+      __html: processLine(line, linkedin, github, portfolio)
+    }}
+  />
+)
       continue
     }
 
