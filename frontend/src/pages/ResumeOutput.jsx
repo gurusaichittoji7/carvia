@@ -192,9 +192,10 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   <div
     id="resume-content"
     style={{
-      fontFamily:FONT[tmpl],
-      color:"#111"
-    }}
+  fontFamily:FONT[tmpl],
+  color:"#111",
+  width:"100%"
+}}
   >
     {elements}
   </div>
@@ -227,7 +228,7 @@ export default function ResumeOutput() {
     const content = document.querySelector("#resume-content")
     if (!content) return
     const w = window.open("","_blank")
-    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:24px 36px;max-width:800px;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
+    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;@page{size:A4;margin:0;}}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:10mm 12mm;width:210mm;min-height:297mm;padding:12mm 14mm;margin:0 auto;;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
     w.document.close()
     setTimeout(()=>{w.focus();w.print()},500)
   }
@@ -253,8 +254,8 @@ export default function ResumeOutput() {
           </button>
         ))}
       </div>
-      <div style={{maxWidth:900,margin:"16px auto",padding:"0 16px"}}>
-        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"28px 42px"}}>
+      <div style={{maxWidth:1100,margin:"8px auto",padding:"0 16px"}}>
+        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"18px 24px"}}>
           <ResumeContent resume={resume} tmpl={tmpl} linkedin={linkedin} github={github} portfolio={portfolio} />
         </div>
       </div>
