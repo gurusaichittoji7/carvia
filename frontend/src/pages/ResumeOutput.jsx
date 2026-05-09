@@ -51,7 +51,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   textAlign:"center",
   fontSize:24,
   fontWeight:700,
-  marginBottom:6
+  marginBottom:2
 },
     modern:       { fontSize:24, fontWeight:700, color:"#2563eb" },
     minimal:      { fontSize:26, fontWeight:200, letterSpacing:6, textTransform:"uppercase" },
