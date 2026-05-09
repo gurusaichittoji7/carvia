@@ -9,7 +9,7 @@ const TEMPLATES = [
   { id:"executive", label:"Executive" },
 ]
 
-const FONT = { classic:"Georgia,serif", modern:"Arial,sans-serif", minimal:"Helvetica,sans-serif", professional:"Arial,sans-serif", executive:"Georgia,serif" }
+const FONT = { classic:"Times New Roman, serif", modern:"Arial,sans-serif", minimal:"Helvetica,sans-serif", professional:"Arial,sans-serif", executive:"Georgia,serif" }
 const SECTION_KEYS = ["SUMMARY","SKILLS","EXPERIENCE","EDUCATION","PROJECTS","CERTIFICATIONS","ACHIEVEMENTS","TECHNICAL SKILLS","PROFESSIONAL SUMMARY","PROFESSIONAL EXPERIENCE","WORK HISTORY"]
 
 function isSection(line) {
@@ -100,8 +100,8 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
 
     if (line.includes(" | ") && line.length < 120) {
       const parts = line.split(" | ")
-      const last = parts[parts.length-1].trim()
-      const first = parts.slice(0,-1).join(" | ").trim()
+      const last = parts[parts.length - 1].trim()
+      const first = parts.slice(0, -1).join(" | ").trim()
       elements.push(
           <div
   key={i}
