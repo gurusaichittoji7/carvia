@@ -20,6 +20,7 @@ function isSection(line) {
 function processLine(line, linkedin, github, portfolio) {
   return line
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/LinkedIn/g, linkedin ? "<a href=\""+linkedin+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">LinkedIn</a>" : "LinkedIn")
     .replace(/GitHub/g, github ? "<a href=\""+github+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">GitHub</a>" : "GitHub")
     .replace(/Portfolio/g, portfolio ? "<a href=\""+portfolio+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">Portfolio</a>" : "Portfolio")
@@ -32,7 +33,13 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   const elements = []
 
   const sectionStyle = {
-    classic:      { borderBottom:"1.5px solid #111", color:"#111", marginTop:8, paddingBottom:2 },
+    classic: {
+  borderBottom:"1px solid #111",
+  color:"#111",
+  marginTop:18,
+  marginBottom:10,
+  paddingBottom:4
+},
     modern:       { borderLeft:"3px solid #2563eb", paddingLeft:8, color:"#2563eb", marginTop:8 },
     minimal:      { color:"#999", letterSpacing:3, marginTop:10 },
     professional: { borderBottom:"1px solid #e2e8f0", color:"#888", marginTop:8, paddingBottom:2 },
@@ -40,7 +47,12 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   }[tmpl]
 
   const nameStyle = {
-    classic:      { textAlign:"center", fontSize:22, fontWeight:700, letterSpacing:1 },
+    classic: {
+  textAlign:"center",
+  fontSize:24,
+  fontWeight:700,
+  marginBottom:6
+},
     modern:       { fontSize:24, fontWeight:700, color:"#2563eb" },
     minimal:      { fontSize:26, fontWeight:200, letterSpacing:6, textTransform:"uppercase" },
     professional: { fontSize:22, fontWeight:300, letterSpacing:3, textTransform:"uppercase" },
@@ -48,7 +60,13 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   }[tmpl]
 
   const contactStyle = {
-    classic:      { textAlign:"center", fontSize:12, color:"#555", marginTop:3 },
+    classic: {
+  textAlign:"center",
+  fontSize:12,
+  color:"#444",
+  marginTop:2,
+  marginBottom:18
+},
     modern:       { fontSize:12, color:"#555", marginTop:3 },
     minimal:      { fontSize:11, color:"#aaa", letterSpacing:2, marginTop:4 },
     professional: { fontSize:12, color:"#777", marginTop:3 },
@@ -74,51 +92,85 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
     }
 
     if (isSection(line)) {
-      elements.push(<div key={i} style={{fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:6,...sectionStyle}}>{line}</div>)
+      elements.push(<div key={i} style={{fontSize:15,fontWeight:700,textTransform:"uppercase",letterSpacing:.3,marginBottom:6,...sectionStyle}}>{line}</div>)
       continue
     }
 
     if (/^[•\-\*]/.test(line)) {
-      elements.push(
-  <div
-    key={i}
-    style={{
-      fontSize:11,
-      fontWeight:700,
-      textTransform:"uppercase",
-      letterSpacing:1,
-      marginBottom:6,
-      ...sectionStyle
-    }}
-    dangerouslySetInnerHTML={{
-      __html: processLine(line, linkedin, github, portfolio)
-    }}
-  />
-)
-      continue
-    }
+  elements.push(
+    <div
+      key={i}
+      style={{
+        display:"flex",
+        gap:10,
+        marginBottom:6,
+        fontSize:12,
+        lineHeight:1.45,
+        alignItems:"flex-start"
+      }}
+    >
+      <span style={{flexShrink:0}}>•</span>
+
+      <span
+        dangerouslySetInnerHTML={{
+          __html: processLine(
+            line.replace(/^[•\-\*]\s*/, ""),
+            linkedin,
+            github,
+            portfolio
+          )
+        }}
+      />
+    </div>
+  )
+
+  continue
+}
 
     if (line.includes(" | ") && line.length < 120) {
-      const parts = line.split(" | ")
-      const last = parts[parts.length - 1].trim()
-      const first = parts.slice(0, -1).join(" | ").trim()
-      elements.push(
-          <div
-  key={i}
-  style={{
-    display:"flex",
-    justifyContent:"space-between",
-    alignItems:"baseline",
-    fontSize:12,
-    lineHeight:1.4
-  }}
->
-          <span style={{fontWeight:700,fontSize:13}} dangerouslySetInnerHTML={{__html: processLine(first, linkedin, github, portfolio)}} />
-          <span style={{fontSize:11,fontStyle:"italic",color:"#666",marginLeft:16,whiteSpace:"nowrap"}}>{last}</span>
-        </div>
-      )
-      continue
-    }
+  const parts = line.split(" | ")
+
+  const last = parts[parts.length - 1].trim()
+  const first = parts.slice(0, -1).join(" | ").trim()
+
+  elements.push(
+    <div
+      key={i}
+      style={{
+        display:"flex",
+        justifyContent:"space-between",
+        alignItems:"baseline",
+        marginTop:12,
+        marginBottom:2,
+        fontSize:13
+      }}
+    >
+      <span
+        style={{
+          fontWeight:700,
+          fontSize:13,
+          color:"#111"
+        }}
+        dangerouslySetInnerHTML={{
+          __html: processLine(first, linkedin, github, portfolio)
+        }}
+      />
+
+      <span
+        style={{
+          fontSize:12,
+          fontStyle:"italic",
+          color:"#555",
+          whiteSpace:"nowrap"
+        }}
+      >
+        {last}
+      </span>
+    </div>
+  )
+
+  continue
+}
 
     elements.push(
   <div
@@ -136,7 +188,17 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
 )
   }
 
-  return <div id="resume-content" style={{fontFamily:FONT[tmpl]}}>{elements}</div>
+  return (
+  <div
+    id="resume-content"
+    style={{
+      fontFamily:FONT[tmpl],
+      color:"#111"
+    }}
+  >
+    {elements}
+  </div>
+)
 }
 
 export default function ResumeOutput() {
@@ -191,8 +253,8 @@ export default function ResumeOutput() {
           </button>
         ))}
       </div>
-      <div style={{maxWidth:860,margin:"32px auto",padding:"0 16px"}}>
-        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"32px 44px"}}>
+      <div style={{maxWidth:900,margin:"32px auto",padding:"0 16px"}}>
+        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"42px 56px"}}>
           <ResumeContent resume={resume} tmpl={tmpl} linkedin={linkedin} github={github} portfolio={portfolio} />
         </div>
       </div>
