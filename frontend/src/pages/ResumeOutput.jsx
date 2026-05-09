@@ -19,6 +19,8 @@ function isSection(line) {
 
 function processLine(line, linkedin, github, portfolio) {
   return line
+    .replace(/^([^:]+:)/, "<strong>$1</strong>")
+    .replace(/^([^–-]+)(\s[–-]\s)/, "<strong>$1</strong>$2")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/LinkedIn/g, linkedin ? "<a href=\""+linkedin+"\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;font-weight:600;\">LinkedIn</a>" : "LinkedIn")
