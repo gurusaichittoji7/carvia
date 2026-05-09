@@ -36,9 +36,9 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
     classic: {
   borderBottom:"1px solid #111",
   color:"#111",
-  marginTop:18,
-  marginBottom:10,
-  paddingBottom:4
+  marginTop:10,
+  marginBottom:5,
+  paddingBottom:2
 },
     modern:       { borderLeft:"3px solid #2563eb", paddingLeft:8, color:"#2563eb", marginTop:8 },
     minimal:      { color:"#999", letterSpacing:3, marginTop:10 },
@@ -65,7 +65,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   fontSize:12,
   color:"#444",
   marginTop:2,
-  marginBottom:18
+  marginBottom:6
 },
     modern:       { fontSize:12, color:"#555", marginTop:3 },
     minimal:      { fontSize:11, color:"#aaa", letterSpacing:2, marginTop:4 },
@@ -84,7 +84,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       const name = headerLines[0] || ""
       const contact = headerLines.slice(1).join(" | ")
       elements.push(
-        <div key="hdr" style={{marginBottom:6}}>
+        <div key="hdr" style={{marginBottom:2}}>
           <div style={nameStyle}>{name}</div>
           <div style={contactStyle} dangerouslySetInnerHTML={{__html: processLine(contact, linkedin, github, portfolio)}} />
         </div>
@@ -103,9 +103,9 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
       style={{
         display:"flex",
         gap:10,
-        marginBottom:6,
+        marginBottom:2,
         fontSize:12,
-        lineHeight:1.45,
+        lineHeight:1.3,
         alignItems:"flex-start"
       }}
     >
@@ -140,8 +140,8 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
         display:"flex",
         justifyContent:"space-between",
         alignItems:"baseline",
-        marginTop:12,
-        marginBottom:2,
+        marginTop:6,
+        marginBottom:0,
         fontSize:13
       }}
     >
@@ -177,8 +177,8 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
     key={i}
     style={{
       fontSize:12,
-      lineHeight:1.5,
-      marginBottom:6,
+      lineHeight:1.35,
+      marginBottom:3,
       color:"#111"
     }}
     dangerouslySetInnerHTML={{
@@ -227,7 +227,7 @@ export default function ResumeOutput() {
     const content = document.querySelector("#resume-content")
     if (!content) return
     const w = window.open("","_blank")
-    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:36px 48px;max-width:800px;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
+    w.document.write("<!DOCTYPE html><html><head><title>Resume</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"+FONT[tmpl]+";font-size:13px;line-height:1.6;color:#111;padding:24px 36px;max-width:800px;margin:0 auto;}a{color:#2563eb;text-decoration:none;}strong{font-weight:700;}</style></head><body>"+content.innerHTML+"</body></html>")
     w.document.close()
     setTimeout(()=>{w.focus();w.print()},500)
   }
@@ -253,8 +253,8 @@ export default function ResumeOutput() {
           </button>
         ))}
       </div>
-      <div style={{maxWidth:900,margin:"32px auto",padding:"0 16px"}}>
-        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"42px 56px"}}>
+      <div style={{maxWidth:900,margin:"16px auto",padding:"0 16px"}}>
+        <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 4px rgba(0,0,0,.08)",padding:"28px 42px"}}>
           <ResumeContent resume={resume} tmpl={tmpl} linkedin={linkedin} github={github} portfolio={portfolio} />
         </div>
       </div>
