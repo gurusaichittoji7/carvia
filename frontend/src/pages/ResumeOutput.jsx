@@ -74,7 +74,7 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
   const contactStyle = {
     classic: {
   textAlign:"center",
-  fontSize:12,
+  fontSize:13,
   color:"#444",
   marginTop:2,
   marginBottom:6
@@ -115,8 +115,8 @@ function ResumeContent({ resume, tmpl, linkedin, github, portfolio }) {
         display:"flex",
         gap:10,
         marginBottom:2,
-        fontSize:12,
-        lineHeight:1.3,
+        fontSize:13,
+        lineHeight:1.5,
         alignItems:"flex-start"
       }}
     >
