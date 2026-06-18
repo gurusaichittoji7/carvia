@@ -159,7 +159,7 @@ ANALYZE_SYSTEM = (
 )
 
 INTERVIEW_SYSTEM = (
-    "You are an expert technical interviewer and career coach. Generate 10 targeted interview questions "
+    "You are an expert technical interviewer and career coach. Generate 7 targeted interview questions "
     "based on the candidate's resume and the job description. Mix question types: Technical, Behavioral, Situational, Role-Specific. "
     "Return ONLY a valid JSON object with exactly these keys: "
     "{ "
@@ -169,6 +169,7 @@ INTERVIEW_SYSTEM = (
     "] "
     "} "
     "No explanation, no markdown fences, no commentary. Pure JSON only."
+    "Keep each answer under 65 words. Keep each tip under 20 words. "
 )
 
 LENGTH_MAP = {"concise": "3 paragraphs", "standard": "4 paragraphs", "detailed": "5 paragraphs"}
@@ -218,7 +219,7 @@ async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depe
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=4096,
+            max_tokens=6000,
             system=INTERVIEW_SYSTEM,
             messages=messages,
         )
