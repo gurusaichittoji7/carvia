@@ -62,3 +62,13 @@ export async function generateInterviewPrep(payload) {
   if (!res.ok) throw new Error((await res.json()).detail || "Failed")
   return res.json()
 }
+
+export async function updateResumeStatus(id, status) {
+  const res = await fetch(BASE + "/dashboard/" + id + "/status", {
+    method: "PATCH",
+    headers: await authHeaders(),
+    body: JSON.stringify({ status })
+  })
+  if (!res.ok) throw new Error("Failed to update status")
+  return res.json()
+}

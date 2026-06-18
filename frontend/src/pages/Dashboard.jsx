@@ -1,33 +1,57 @@
 import { useEffect, useState } from 'react'
-import { getDashboard, deleteResume } from '../lib/api'
+import { getDashboard, deleteResume, updateResumeStatus } from '../lib/api'
+
+const STATUS_OPTIONS = ['Applied', 'Interviewing', 'Offer', 'Rejected']
+
+const statusStyle = {
+  'Applied':      'bg-blue-50 text-blue-600 border-blue-200',
+  'Interviewing': 'bg-yellow-50 text-yellow-600 border-yellow-200',
+  'Offer':        'bg-green-50 text-green-600 border-green-200',
+  'Rejected':     'bg-red-50 text-red-500 border-red-200',
+}
+
 export default function Dashboard() {
   const [resumes, setResumes] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
   const [copied, setCopied] = useState(false)
+
   useEffect(() => {
     getDashboard().then(d => { setResumes(d.resumes); setLoading(false) })
   }, [])
+
   async function handleDelete(id) {
     await deleteResume(id)
     setResumes(r => r.filter(x => x.id !== id))
     if (selected && selected.id === id) setSelected(null)
   }
+
+  async function handleStatus(id, status) {
+    await updateResumeStatus(id, status)
+    setResumes(r => r.map(x => x.id === id ? { ...x, status } : x))
+    if (selected && selected.id === id) setSelected(s => ({ ...s, status }))
+  }
+
   function copy() {
     navigator.clipboard.writeText(selected.tailored_resume)
     setCopied(true); setTimeout(() => setCopied(false), 2000)
   }
+
   function downloadTxt() {
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([selected.tailored_resume], { type: 'text/plain' }))
     a.download = 'carvia_resume.txt'; a.click()
   }
+
   if (loading) return (
     <div className="flex items-center justify-center h-64 text-gray-400 text-sm">Loading...</div>
   )
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-xl font-medium text-gray-900 mb-6">Your saved resumes</h1>
+      <h1 className="text-xl font-medium text-gray-900 mb-1">Dashboard</h1>
+      <p className="text-sm text-gray-400 mb-6">Track your job applications and saved resumes.</p>
+
       {resumes.length === 0 ? (
         <div className="text-center py-16 text-gray-400 text-sm border border-dashed border-gray-200 rounded-2xl">
           No saved resumes yet. Tailor your first resume to see it here.
@@ -40,15 +64,19 @@ export default function Dashboard() {
                 className={'border rounded-xl p-4 cursor-pointer transition-colors ' + (selected && selected.id === r.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300')}>
                 <p className="text-sm font-medium text-gray-900 truncate">{r.job_title}</p>
                 <p className="text-xs text-gray-400 mt-1">{new Date(r.created_at).toLocaleDateString()}</p>
+                <span className={'text-xs border px-2 py-0.5 rounded-full mt-2 inline-block ' + (statusStyle[r.status || 'Applied'])}>
+                  {r.status || 'Applied'}
+                </span>
               </div>
             ))}
           </div>
+
           <div className="col-span-2">
             {selected ? (
               <div className="border border-gray-200 rounded-2xl p-6 bg-white">
                 <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                   <h2 className="font-medium text-gray-900">{selected.job_title}</h2>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button onClick={copy}
                       className={'text-xs border rounded-lg px-3 py-1.5 ' + (copied ? 'border-green-300 text-green-600' : 'border-gray-200 hover:bg-gray-50')}>
                       {copied ? '✓ Copied' : 'Copy'}
@@ -57,7 +85,21 @@ export default function Dashboard() {
                     <button onClick={() => handleDelete(selected.id)} className="text-xs border border-red-200 text-red-600 rounded-lg px-3 py-1.5 hover:bg-red-50">Delete</button>
                   </div>
                 </div>
-                <pre className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed max-h-96 overflow-y-auto">
+
+                {/* Job Tracker */}
+                <div className="mb-4">
+                  <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-2">Application Status</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {STATUS_OPTIONS.map(s => (
+                      <button key={s} onClick={() => handleStatus(selected.id, s)}
+                        className={'text-xs border px-3 py-1.5 rounded-full transition-colors ' + ((selected.status || 'Applied') === s ? statusStyle[s] + ' font-medium' : 'border-gray-200 text-gray-400 hover:border-gray-300')}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed max-h-96 overflow-y-auto border-t border-gray-100 pt-4">
                   {selected.tailored_resume}
                 </pre>
               </div>
