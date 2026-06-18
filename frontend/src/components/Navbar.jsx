@@ -9,9 +9,9 @@ export default function Navbar({ session }) {
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
   <rect width="36" height="36" rx="10" fill="#2563eb"/>
   <rect x="10" y="8" width="13" height="17" rx="2" fill="white" opacity="0.9"/>
-  <path d="M13 14 L20 14 M13 17 L20 17 M13 20 L17 20" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M13 14 L20 14 M13 17 L20 17 M13 20 L17 20" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round"/>
   <circle cx="23" cy="23" r="6" fill="#0a0a0a"/>
-  <path d="M20 23 L22 25 L26 21" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 23 L22 25 L26 21" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
 </svg>
     <span className="text-lg font-bold text-gray-900">Car<span className="text-blue-600">via</span></span>      </Link>
       <div className="flex items-center gap-6">
