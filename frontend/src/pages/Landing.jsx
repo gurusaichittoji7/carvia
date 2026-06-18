@@ -69,10 +69,10 @@ export default function Landing({ session }) {
       </div>
 
       {/* CTA */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-6 py-24 text-center">
-          <h2 className="text-4xl font-bold mb-4">Ready to land your next role?</h2>
-          <p className="text-gray-400 mb-8 text-lg">Join thousands of job seekers using Carvia to get more interviews.</p>
+          <h2 className="text-4xl font-bold mb-4 text-gray-900">Ready to land your next role?</h2>
+          <p className="text-gray-500 mb-8 text-lg">Join thousands of job seekers using Carvia to get more interviews.</p>
           <Link to={session ? '/tailor' : '/auth'}
             className="bg-blue-600 text-white px-10 py-4 rounded-xl text-base font-semibold hover:bg-blue-700 inline-block">
             Start tailoring for free →

@@ -7,8 +7,9 @@ import Auth from './pages/Auth'
 import Tailor from './pages/Tailor'
 import CoverLetter from './pages/CoverLetter'
 import Dashboard from './pages/Dashboard'
-import ResumeOutput from './pages/ResumeOutput'
+import Analyze from './pages/Analyze'
 import ProtectedRoute from './components/ProtectedRoute'
+import Interview from './pages/Interview'
 
 export default function App() {
   const [session, setSession] = useState(undefined)
@@ -20,13 +21,15 @@ export default function App() {
   if (session === undefined) return null
   return (
     <BrowserRouter>
+      <Navbar session={session} />
       <Routes>
-        <Route path="/" element={<><Navbar session={session} /><Landing session={session} /></>} />
+        <Route path="/" element={<Landing session={session} />} />
         <Route path="/auth" element={session ? <Navigate to="/tailor" /> : <Auth />} />
-        <Route path="/tailor" element={<ProtectedRoute session={session}><Navbar session={session} /><Tailor /></ProtectedRoute>} />
-        <Route path="/cover-letter" element={<ProtectedRoute session={session}><Navbar session={session} /><CoverLetter /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute session={session}><Navbar session={session} /><Dashboard /></ProtectedRoute>} />
-        <Route path="/resume-output" element={<ProtectedRoute session={session}><ResumeOutput /></ProtectedRoute>} />
+        <Route path="/tailor" element={<ProtectedRoute session={session}><Tailor /></ProtectedRoute>} />
+        <Route path="/cover-letter" element={<ProtectedRoute session={session}><CoverLetter /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute session={session}><Dashboard /></ProtectedRoute>} />
+        <Route path="/analyze" element={<ProtectedRoute session={session}><Analyze /></ProtectedRoute>} />
+        <Route path="/interview" element={<ProtectedRoute session={session}><Interview /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

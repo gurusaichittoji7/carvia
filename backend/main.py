@@ -218,3 +218,88 @@ async def get_dashboard(request: Request, user: dict = Depends(get_current_user)
 async def delete_resume(resume_id: str, request: Request, user: dict = Depends(get_current_user)):
     supabase.table("resumes").delete().eq("id", resume_id).eq("user_id", user["id"]).execute()
     return {"deleted": True}
+
+class AnalyzeRequest(BaseModel):
+    resume_text: Union[str, None] = None
+    resume_pdf_base64: Union[str, None] = None
+    job_description: str
+
+ANALYZE_SYSTEM = (
+    "You are an expert ATS analyst and career coach. Analyze the match between a resume and a job description. "
+    "Return ONLY a valid JSON object with exactly these keys: "
+    "{ "
+    "\"match_score\": <integer 0-100>, "
+    "\"verdict\": <\"APPLY\" or \"SKIP\">, "
+    "\"h1b_signal\": <\"Likely\" or \"Unlikely\" or \"Unclear\">, "
+    "\"matched_keywords\": [<list of strings>], "
+    "\"missing_keywords\": [<list of strings>], "
+    "\"strengths\": [<list of 3 strings>], "
+    "\"gaps\": [<list of 3 strings>], "
+    "\"recommendation\": <one sentence string> "
+    "} "
+    "No explanation, no markdown fences, no commentary. Pure JSON only."
+)
+
+@app.post("/analyze")
+@limiter.limit("20/hour")
+async def analyze_match(body: AnalyzeRequest, request: Request, user: dict = Depends(get_current_user)):
+    if not body.resume_text and not body.resume_pdf_base64:
+        raise HTTPException(status_code=400, detail="Resume text or PDF required")
+    extra = (
+        f"Job description:\n\n{body.job_description}\n\n"
+        "Analyze the match between my resume and this job description. Return only the JSON object."
+    )
+    messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=1024,
+            system=ANALYZE_SYSTEM,
+            messages=messages,
+        )
+        import json
+        result = json.loads(response.content[0].text)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Claude error: {str(e)}")
+    
+class InterviewRequest(BaseModel):
+    resume_text: Union[str, None] = None
+    resume_pdf_base64: Union[str, None] = None
+    job_description: str
+
+INTERVIEW_SYSTEM = (
+    "You are an expert technical interviewer and career coach. Generate 10 targeted interview questions "
+    "based on the candidate's resume and the job description. Mix question types: Technical, Behavioral, Situational, Role-Specific. "
+    "Return ONLY a valid JSON object with exactly these keys: "
+    "{ "
+    "\"role\": <job title string>, "
+    "\"questions\": [ "
+    "{ \"question\": <string>, \"category\": <\"Technical\"|\"Behavioral\"|\"Situational\"|\"Role-Specific\">, \"answer\": <model answer string>, \"tip\": <short interviewer tip string> } "
+    "] "
+    "} "
+    "No explanation, no markdown fences, no commentary. Pure JSON only."
+)
+
+@app.post("/interview")
+@limiter.limit("10/hour")
+async def interview_prep(body: InterviewRequest, request: Request, user: dict = Depends(get_current_user)):
+    if not body.resume_text and not body.resume_pdf_base64:
+        raise HTTPException(status_code=400, detail="Resume text or PDF required")
+    extra = (
+        f"Job description:\n\n{body.job_description}\n\n"
+        "Generate 10 interview questions with model answers for this role based on my resume. Return only the JSON object."
+    )
+    messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=2048,
+            system=INTERVIEW_SYSTEM,
+            messages=messages,
+        )
+        import json
+        result = json.loads(response.content[0].text)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Claude error: {str(e)}")

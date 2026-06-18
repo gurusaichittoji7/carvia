@@ -19,6 +19,8 @@ export default function Navbar({ session }) {
           <>
             <Link to="/tailor" className="text-sm text-gray-600 hover:text-gray-900">Resume</Link>
             <Link to="/cover-letter" className="text-sm text-gray-600 hover:text-gray-900">Cover Letter</Link>
+            <Link to="/analyze" className="text-sm text-gray-600 hover:text-gray-900">Analyzer</Link>
+            <Link to="/interview" className="text-sm text-gray-600 hover:text-gray-900">Interview Prep</Link>
             <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">Dashboard</Link>
             <button onClick={signOut} className="text-sm text-gray-500 hover:text-gray-700">Sign out</button>
           </>
