@@ -218,8 +218,8 @@ async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depe
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=2048,
-            system=RESUME_SYSTEM,
+            max_tokens=4096,
+            system=INTERVIEW_SYSTEM,
             messages=messages,
         )
         tailored = response.content[0].text
