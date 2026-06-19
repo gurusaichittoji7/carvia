@@ -19,10 +19,10 @@ function isSection(line) {
 
 function processLine(line, linkedin, github, portfolio) {
   return line
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
     .replace(/^([^:]+:)/, "<strong>$1</strong>")
     .replace(/^([^–\-\|]+)\s*[–\-]\s/, "<strong>$1</strong> – ")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\|\s*\|/g, "|")
     .replace(/\|\s*$/g, "")
     .replace(/^\s*\|\s*/g, "")

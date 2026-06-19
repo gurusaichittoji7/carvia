@@ -31,8 +31,6 @@ supabase: Client = create_client(
     os.getenv("SUPABASE_SERVICE_ROLE_KEY"),
 )
 
-# ── Auth ──────────────────────────────────────────────────────────────────────
-
 async def get_current_user(request: Request) -> dict:
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
@@ -45,8 +43,6 @@ async def get_current_user(request: Request) -> dict:
         return {"id": user.user.id, "email": user.user.email}
     except Exception:
         raise HTTPException(status_code=401, detail="Token verification failed")
-
-# ── Models ────────────────────────────────────────────────────────────────────
 
 class ResumeRequest(BaseModel):
     resume_text: Union[str, None] = None
@@ -78,8 +74,6 @@ class InterviewRequest(BaseModel):
 class StatusUpdate(BaseModel):
     status: str
 
-# ── System Prompts ────────────────────────────────────────────────────────────
-
 RESUME_SYSTEM = (
     "You are an elite ATS resume writer specializing in high-conversion software engineering and AI/ML resumes. "
     "Transform the candidate's existing resume into a recruiter-ready, ATS-optimized, visually polished resume tailored specifically to the provided job description. "
@@ -91,11 +85,12 @@ RESUME_SYSTEM = (
     "5) Ensure the resume looks like a professionally designed modern tech resume rather than generic plain text. "
     "VISUAL FORMATTING REQUIREMENTS: "
     "6) The output must be formatted for proper DOCX/PDF rendering with professional spacing and hierarchy. "
-    "7) Do NOT use markdown symbols like ** or * anywhere in the resume output. The frontend will handle all visual styling. "
+    "7) Use ** around text you want bolded (e.g. **Project Name**) — the frontend converts this to real bold. "
+    "7b) NEVER use a single asterisk * for italics or emphasis anywhere. Only use double asterisks ** for bold, and only around short labels like skill categories or project names. "
     "8) Bold only meaningful/high-value content — avoid overusing bold formatting. "
     "9) Project names must always be bolded. "
     "10) Key technologies, AI/ML tools, cloud platforms, frameworks, and measurable achievements should be selectively bolded where impactful. "
-    "11) Section headers must be plain uppercase text only, without markdown symbols. Example: SUMMARY, SKILLS, EXPERIENCE. "
+    "11) Section headers must be plain uppercase text only, without ** markers. Example: SUMMARY, SKILLS, EXPERIENCE. "
     "HEADER FORMAT RULES: "
     "12) Candidate name must appear alone at the top in prominent formatting style. "
     "13) The contact line directly below the name must stay on ONE SINGLE LINE. "
@@ -124,14 +119,15 @@ RESUME_SYSTEM = (
     "FINAL OUTPUT RULES: "
     "27) Return ONLY the final formatted resume content. "
     "28) No explanations, no markdown fences, no commentary. "
-    "29) The output should be immediately usable for generating a properly formatted DOCX or PDF resume with visible bold formatting."
-    "30) CRITICAL: Use actual newlines between every section, every job entry, every bullet point, and every line. Never use | as a line separator. Each bullet point must be on its own separate line. Each section header must be on its own separate line."
-    "31) CRITICAL: Never start a bullet point with **bold text**: — instead write the category name in bold INLINE within the sentence or just list items without a bold label prefix."
-    "32) CRITICAL: The entire resume MUST fit on ONE A4 page. To achieve this: max 3 bullets per job, each bullet max 15 words, skills as single comma-separated lines, summary max 3 sentences."
-    "33) STRICT FORMAT: Do not use **bold**, *italic*, markdown tables, markdown headings, or markdown bullets. Use only plain text section headers and bullet character • for bullet points."
-    "34) NEVER put a bullet before job titles, project names, education, or certifications. Bullets are only for achievement statements under jobs/projects."
-    "35) In SKILLS section, bold ONLY the category labels before the colon."
-    "36) In PROJECTS section, bold ONLY the project name before the dash."
+    "29) The output should be immediately usable for generating a properly formatted DOCX or PDF resume with visible bold formatting. "
+    "30) CRITICAL: Use actual newlines between every section, every job entry, every bullet point, and every line. Never use | as a line separator. Each bullet point must be on its own separate line. Each section header must be on its own separate line. "
+    "31) CRITICAL: Never start a bullet point with **bold text**: — instead write the category name in bold INLINE within the sentence or just list items without a bold label prefix. Example wrong: '• **Languages:** Python' — Example right: 'Languages & Frameworks: Python, Java...' as a plain line, not a bullet. "
+    "32) CRITICAL: The entire resume MUST fit on ONE A4 page. To achieve this: max 3 bullets per job, each bullet max 15 words, skills as single comma-separated lines, summary max 3 sentences. For PROJECTS section include ALL projects from the original resume but keep each description to 1 line only. Remove only experience bullets not relevant to the job. "
+    "33) Do not use markdown tables, markdown headings (#), or markdown bullets (-). Use only plain text section headers and bullet character • for bullet points, plus ** for bold as described above. "
+    "34) NEVER put a bullet before job titles, project names, education, or certifications. Bullets are only for achievement statements under jobs/projects. "
+    "35) In SKILLS section, bold ONLY the category labels before the colon. Example: '**Languages & Frameworks:**' should be bold while the technologies remain normal text. "
+    "36) In PROJECTS section, bold ONLY the project name before the dash. Example: '**Looksy** –' should be bold while the project description remains normal text. "
+    "37) CRITICAL: EVERY single project in the PROJECTS section must follow the EXACT same format: **Project Name** – description. No exceptions, no variations. Double-check before output that all projects use this identical pattern with the em dash –. "
 )
 
 COVER_SYSTEM = (
@@ -161,6 +157,7 @@ ANALYZE_SYSTEM = (
 INTERVIEW_SYSTEM = (
     "You are an expert technical interviewer and career coach. Generate 7 targeted interview questions "
     "based on the candidate's resume and the job description. Mix question types: Technical, Behavioral, Situational, Role-Specific. "
+    "Keep each answer under 80 words. Keep each tip under 20 words. "
     "Return ONLY a valid JSON object with exactly these keys: "
     "{ "
     "\"role\": <job title string>, "
@@ -169,12 +166,9 @@ INTERVIEW_SYSTEM = (
     "] "
     "} "
     "No explanation, no markdown fences, no commentary. Pure JSON only."
-    "Keep each answer under 65 words. Keep each tip under 20 words. "
 )
 
 LENGTH_MAP = {"concise": "3 paragraphs", "standard": "4 paragraphs", "detailed": "5 paragraphs"}
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def extract_job_title(jd: str) -> str:
     for line in jd.strip().splitlines():
@@ -197,16 +191,6 @@ def parse_json_response(text: str) -> dict:
         if text.startswith("json"):
             text = text[4:]
     return json.loads(text.strip())
-import re
-
-def strip_markdown(text: str) -> str:
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-    text = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
-    text = re.sub(r'^---+$', '', text, flags=re.MULTILINE)
-    text = re.sub(r'(?<!\w)\*(.*?)\*(?!\w)', r'\1', text)
-    return text
-
-# ── Routes ────────────────────────────────────────────────────────────────────
 
 @app.get("/health")
 def health():
@@ -227,11 +211,11 @@ async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depe
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=6000,
-            system=INTERVIEW_SYSTEM,
+            max_tokens=2048,
+            system=RESUME_SYSTEM,
             messages=messages,
         )
-        tailored = strip_markdown(response.content[0].text)
+        tailored = response.content[0].text
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=502, detail=f"Claude error: {str(e)}")
@@ -274,7 +258,6 @@ async def cover_letter(body: CoverLetterRequest, request: Request, user: dict = 
 
 @app.post("/analyze")
 async def analyze_match(body: AnalyzeRequest, request: Request, user: dict = Depends(get_current_user)):
-    print("ANALYZE CALLED", body.job_description[:50])
     if not body.resume_text and not body.resume_pdf_base64:
         raise HTTPException(status_code=400, detail="Resume text or PDF required")
     extra = (
@@ -289,13 +272,9 @@ async def analyze_match(body: AnalyzeRequest, request: Request, user: dict = Dep
             system=ANALYZE_SYSTEM,
             messages=messages,
         )
-        print("STOP REASON:", response.stop_reason)
-        raw = response.content[0].text
-        print("RAW:", raw[:200])
-        result = parse_json_response(raw)
+        result = parse_json_response(response.content[0].text)
         return result
     except json.JSONDecodeError as e:
-        print("JSON ERROR:", e)
         raise HTTPException(status_code=502, detail=f"JSON parse error: {str(e)}")
     except Exception as e:
         traceback.print_exc()
@@ -308,18 +287,17 @@ async def interview_prep(body: InterviewRequest, request: Request, user: dict = 
         raise HTTPException(status_code=400, detail="Resume text or PDF required")
     extra = (
         f"Job description:\n\n{body.job_description}\n\n"
-        "Generate 10 interview questions with model answers for this role based on my resume. Return only the JSON object."
+        "Generate 7 interview questions with model answers for this role based on my resume. Return only the JSON object."
     )
     messages = build_messages(body.resume_text, body.resume_pdf_base64, extra)
     try:
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=2048,
+            max_tokens=6000,
             system=INTERVIEW_SYSTEM,
             messages=messages,
         )
-        raw = response.content[0].text
-        result = parse_json_response(raw)
+        result = parse_json_response(response.content[0].text)
         return result
     except json.JSONDecodeError as e:
         raise HTTPException(status_code=502, detail=f"JSON parse error: {str(e)}")

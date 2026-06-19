@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Analyze from './pages/Analyze'
 import ProtectedRoute from './components/ProtectedRoute'
 import Interview from './pages/Interview'
+import ResumeOutput from './pages/ResumeOutput'
 
 export default function App() {
   const [session, setSession] = useState(undefined)
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/dashboard" element={<ProtectedRoute session={session}><Dashboard /></ProtectedRoute>} />
         <Route path="/analyze" element={<ProtectedRoute session={session}><Analyze /></ProtectedRoute>} />
         <Route path="/interview" element={<ProtectedRoute session={session}><Interview /></ProtectedRoute>} />
+        <Route path="/resume-output" element={<ProtectedRoute session={session}><ResumeOutput /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
