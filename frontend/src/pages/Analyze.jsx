@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import mammoth from 'mammoth'
 import { analyzeMatch } from '../lib/api'
+import { useNavigate } from 'react-router-dom'
 
 export default function Analyze() {
   const [tab, setTab] = useState('upload')
@@ -12,26 +13,40 @@ export default function Analyze() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const fileRef = useRef()
+  const navigate = useNavigate()
+  useEffect(() => {
+  const savedJd = sessionStorage.getItem('carvia_jd')
+  const savedResume = sessionStorage.getItem('carvia_resume_text')
+  const savedFileName = sessionStorage.getItem('carvia_file_name')
+  if (savedJd) setJd(savedJd)
+  if (savedResume) { setResumeText(savedResume); setTab('paste') }
+  if (savedFileName) setFileName(savedFileName)
+}, [])
 
-  async function handleFile(file) {
-    const ext = file.name.split('.').pop().toLowerCase()
-    setFileName(file.name)
-    setResumeText('')
-    setResumePdfBase64(null)
-    if (ext === 'txt') {
-      setResumeText(await file.text())
-    } else if (ext === 'docx') {
-      const buf = await file.arrayBuffer()
-      const res = await mammoth.extractRawText({ arrayBuffer: buf })
-      setResumeText(res.value)
-    } else if (ext === 'pdf') {
-      const buf = await file.arrayBuffer()
-      const bytes = new Uint8Array(buf)
-      let binary = ''
-      bytes.forEach(b => binary += String.fromCharCode(b))
-      setResumePdfBase64(btoa(binary))
-    }
+async function handleFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase()
+  setFileName(file.name)
+  sessionStorage.setItem('carvia_file_name', file.name)
+  setResumeText('')
+  setResumePdfBase64(null)
+  if (ext === 'txt') {
+    const text = await file.text()
+    setResumeText(text)
+    sessionStorage.setItem('carvia_resume_text', text)
+  } else if (ext === 'docx') {
+    const buf = await file.arrayBuffer()
+    const res = await mammoth.extractRawText({ arrayBuffer: buf })
+    setResumeText(res.value)
+    sessionStorage.setItem('carvia_resume_text', res.value)
+  } else if (ext === 'pdf') {
+    const buf = await file.arrayBuffer()
+    const bytes = new Uint8Array(buf)
+    let binary = ''
+    bytes.forEach(b => binary += String.fromCharCode(b))
+    setResumePdfBase64(btoa(binary))
+    sessionStorage.setItem('carvia_resume_pdf_base64', btoa(binary))
   }
+}
 
   async function analyze() {
     if (!jd.trim()) { setError('Please paste a job description.'); return }
@@ -95,7 +110,7 @@ export default function Analyze() {
                 onChange={e => e.target.files[0] && handleFile(e.target.files[0])} />
             </div>
           ) : (
-            <textarea value={resumeText} onChange={e => setResumeText(e.target.value)}
+            <textarea value={resumeText} onChange={e => { setResumeText(e.target.value); sessionStorage.setItem('carvia_resume_text', e.target.value) }}
               className="w-full h-48 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
               placeholder="Paste your full resume text here..." />
           )}
@@ -103,7 +118,7 @@ export default function Analyze() {
 
         <div className="border border-gray-200 rounded-2xl p-5 bg-white">
           <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">Job Description</p>
-          <textarea value={jd} onChange={e => setJd(e.target.value)}
+          <textarea value={jd} onChange={e => { setJd(e.target.value); sessionStorage.setItem('carvia_jd', e.target.value) }}
             className="w-full h-64 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
             placeholder="Paste the full job description here..." />
         </div>
@@ -125,9 +140,17 @@ export default function Analyze() {
             </div>
             <div className="text-center">
               <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-2">Verdict</p>
-              <span className={'text-white text-sm font-semibold px-5 py-2 rounded-full ' + verdictColor(result.verdict)}>
-                {result.verdict}
-              </span>
+            {result.verdict === 'APPLY' ? (
+  <button
+    onClick={() => navigate('/tailor', { state: { jd, resumeText, resumePdfBase64, fileName } })}
+    className="text-white text-sm font-semibold px-5 py-2 rounded-full bg-green-600 hover:bg-green-700 transition-colors cursor-pointer">
+    ✅ Apply — Tailor Resume →
+  </button>
+) : (
+  <span className="text-white text-sm font-semibold px-5 py-2 rounded-full bg-red-500">
+    SKIP
+  </span>
+)}
             </div>
             <div className="text-center">
               <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-1">H1B Signal</p>

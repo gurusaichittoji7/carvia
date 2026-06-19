@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { tailorResume } from '../lib/api'
 import mammoth from 'mammoth'
+import { useLocation } from 'react-router-dom'
 export default function Tailor() {
   const [tab, setTab] = useState('upload')
   const [resumeText, setResumeText] = useState('')
@@ -16,6 +17,26 @@ export default function Tailor() {
   const [template, setTemplate] = useState('classic')
   const [copied, setCopied] = useState(false)
   const fileRef = useRef()
+  const location = useLocation()
+useEffect(() => {
+  if (location.state?.jd) {
+    setJd(location.state.jd)
+    sessionStorage.setItem('carvia_jd', location.state.jd)
+  } else {
+    const savedJd = sessionStorage.getItem('carvia_jd')
+    if (savedJd) setJd(savedJd)
+  }
+  if (location.state?.resumeText) {
+    setResumeText(location.state.resumeText)
+    setTab('paste')
+    sessionStorage.setItem('carvia_resume_text', location.state.resumeText)
+  } else {
+    const savedResume = sessionStorage.getItem('carvia_resume_text')
+    const savedFileName = sessionStorage.getItem('carvia_file_name')
+    if (savedResume) { setResumeText(savedResume); setTab('paste') }
+    if (savedFileName) setFileName(savedFileName)
+  }
+}, [])
   async function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase()
     setFileName(file.name)
@@ -87,14 +108,14 @@ export default function Tailor() {
                 onChange={e => e.target.files[0] && handleFile(e.target.files[0])} />
             </div>
           ) : (
-            <textarea value={resumeText} onChange={e => setResumeText(e.target.value)}
+            <textarea value={resumeText} onChange={e => { setResumeText(e.target.value); sessionStorage.setItem('carvia_resume_text', e.target.value) }}
               className="w-full h-48 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
               placeholder="Paste your full resume text here..." />
           )}
         </div>
         <div className="border border-gray-200 rounded-2xl p-5 bg-white">
           <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">Job Description</p>
-          <textarea value={jd} onChange={e => setJd(e.target.value)}
+          <textarea onChange={e => { setJd(e.target.value); sessionStorage.setItem('carvia_jd', e.target.value) }}
             className="w-full h-64 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
             placeholder="Paste the full job description here..." />
         </div>
