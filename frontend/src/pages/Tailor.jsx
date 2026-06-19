@@ -115,8 +115,7 @@ useEffect(() => {
         </div>
         <div className="border border-gray-200 rounded-2xl p-5 bg-white">
           <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">Job Description</p>
-          <textarea onChange={e => { setJd(e.target.value); sessionStorage.setItem('carvia_jd', e.target.value) }}
-            className="w-full h-64 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
+          <textarea value={jd} onChange={e => { setJd(e.target.value); sessionStorage.setItem('carvia_jd', e.target.value) }}            className="w-full h-64 text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-blue-500"
             placeholder="Paste the full job description here..." />
         </div>
       </div>

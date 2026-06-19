@@ -197,6 +197,14 @@ def parse_json_response(text: str) -> dict:
         if text.startswith("json"):
             text = text[4:]
     return json.loads(text.strip())
+import re
+
+def strip_markdown(text: str) -> str:
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^---+$', '', text, flags=re.MULTILINE)
+    text = re.sub(r'(?<!\w)\*(.*?)\*(?!\w)', r'\1', text)
+    return text
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 
@@ -223,7 +231,7 @@ async def tailor_resume(body: ResumeRequest, request: Request, user: dict = Depe
             system=INTERVIEW_SYSTEM,
             messages=messages,
         )
-        tailored = response.content[0].text
+        tailored = strip_markdown(response.content[0].text)
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=502, detail=f"Claude error: {str(e)}")
